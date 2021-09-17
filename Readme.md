@@ -27,15 +27,14 @@ Compared to the [basic demo](https://github.com/CurvSurf/FindSurface-BasicDemo-i
 
 ![fixed](images/fixed.png)
 
-
-2. [Feature types](https://github.com/CurvSurf/FindSurface#auto-detection) of surfaces to detect.
-3. Hide/show the point cloud on the screen.
-4. Confidence levels to filter point cloud (e.g., the "Medium" option means filter out the points having "low" confidence).
+1. [Feature types](https://github.com/CurvSurf/FindSurface#auto-detection) of surfaces to detect.
+2. Hide/show the point cloud on the screen.
+3. Confidence levels to filter point cloud (e.g., the "Medium" option means filter out the points having "low" confidence).
 4. Point cloud scanning mode.
     - "Fixed" means that FindSurface takes about 20k points from ARKit as an input for each frame.
     - "Accumulate" means it takes about 500 points from ARKit as an input for each frame and accumulates them into a 500k points-sized buffer in a FIFO manner. The points are not accumulated unless the camera has a movement.
 5. Switch between smoothed scene depths and scene depths (ARKit option).
-6. Enable/disable FindSurface to start searching geometric shapes.
+6.  Enable/disable FindSurface to start searching geometric shapes.
 7. Keep a snapshot of the currently found geometric shape.
 8. Undo the latest snapshot.
 9. Remove all snapshots.
