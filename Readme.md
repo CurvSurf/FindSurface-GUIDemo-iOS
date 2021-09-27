@@ -12,6 +12,18 @@ This demo app demonstrates a real-time application using FindSurface to search p
 
 
 
+## Requirements
+
+This demo app requires the LiDAR sensor to get a point cloud from ARKit.
+
+- Apple iPad Pro LiDAR
+- Apple iPhone 12 Pro
+- Apple iPhone 12 Pro Max
+- Apple iPhone 13 Pro
+- Apple iPhone 13 Pro Max
+
+
+
 ## Features
 
 Compared to the [basic demo](https://github.com/CurvSurf/FindSurface-BasicDemo-iOS), the gui demo has the following features:
