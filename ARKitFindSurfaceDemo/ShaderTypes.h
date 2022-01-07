@@ -68,6 +68,7 @@ typedef struct {
     matrix_float4x4 modelMatrix;
     int             modelType;  // 0 - General, 1 - Cone, 2 - Torus
     int             modelIndex; // 0 ~ 4 ( 0: Plane, 1: Sphere, 2: Cylinder, 3: Cone, 4: Torus )
+                                // 5: Grid, 6: Frustum
     float           param1;     // Cone -> Top Radius / Bottom Radius, Torus -> Mean Radius
     float           param2;     // Torus -> Tube Radius
 } InstanceUniforms;

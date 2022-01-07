@@ -81,6 +81,9 @@ constant float3 COLOR_LIST[] = {
     float3( 0, 1, 0 ),
     float3( 0, 1, 1 ),
     float3( 1, 0, 1 ),
+    
+    float3( 0.85, 0.85, 0.85 ),
+    float3( 0, 0, 0 ),
 };
 constant float _2_PI_ = 6.28318530718f;
 
@@ -119,9 +122,10 @@ vertex VertexInOut resultMeshGeometryVertexTransform(Vertex in [[stage_in]],
     float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
     float4x4 modelViewMatrix = sharedUniforms.viewMatrix * modelMatrix;
     
+    
     // Calculate the position of our vertex in clip space and output for clipping and rasterization
     out.position = sharedUniforms.projectionMatrix * modelViewMatrix * position;
-    out.color    = float4( COLOR_LIST[ instanceUniforms[iid].modelIndex ], sharedUniforms.meshAlpha );
+    out.color    = float4( COLOR_LIST[ instanceUniforms[iid].modelIndex ], instanceUniforms[iid].modelIndex < 5 ? sharedUniforms.meshAlpha : 1.0f );    
     
     return out;
 }

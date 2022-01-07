@@ -13,21 +13,27 @@ import FindSurfaceFramework
 
 let MIN_TOUCH_RADIUS_PIXEL: Float = 32.0
 let MIN_PROBE_RADIUS_PIXEL: Float = 2.5
+//let ERROR_ADJUST_VALUE: [Float] = [0.0, 0.002, 0.004]
+let ERROR_ADJUST_VALUE: [Float] = [-0.001, 0.001, 0.003]
 
 extension MTKView : RenderDestinationProvider {
 }
 
 class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     
-    private let confidenceControl = UISegmentedControl(items: ["Low", "Medium", "High"])
-    private let smoothedControl   = UISegmentedControl(items: ["Smoothed", "Normal"])
-    private let sampleControl     = UISegmentedControl(items: ["Fixed", "Accumulate"])
+    private let confidenceControl = UISegmentedControl(items: ["C.Low", "C.Med", "C.High"])
+    private let smoothedControl   = UISegmentedControl(items: ["Smth", "Norm"])
+    private let sampleControl     = UISegmentedControl(items: ["Fix", "Acc"])
+    private let accuracyControl   = UISegmentedControl(items: ["E.Low", "E.Med", "E.High"])
     private let typeControl       = UISegmentedControl(items: [UIImage(named: "icon_any")!,
                                                                UIImage(named: "icon_plane")!,
                                                                UIImage(named: "icon_sphere")!,
                                                                UIImage(named: "icon_cylinder")!,
                                                                UIImage(named: "icon_cone")!,
                                                                UIImage(named: "icon_torus")!])
+    
+    private let infoTextView      = UILabel()
+    
     private let gazePointView     = UIImageView(image: UIImage(named: "cube"))
     private let touchRadiusView   = UIView()
     private let probeRadiusView   = UIView()
@@ -37,6 +43,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     private let deleteButton      = UIButton()
     private let undoButton        = UIButton()
     private let showHideButton    = UIButton()
+    private let toggleViewButton  = UIButton()
     
     var session: ARSession!
     var renderer: Renderer!
@@ -72,6 +79,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         if let view = self.view as? MTKView {
             view.device = MTLCreateSystemDefaultDevice()
             view.backgroundColor = UIColor.clear
+            view.clearColor = MTLClearColorMake(1.0, 1.0, 1.0, 1.0)
             view.delegate = self
             
             guard view.device != nil else {
@@ -100,16 +108,31 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         sampleControl.selectedSegmentIndex = renderer.useFullSampling ? 0 : 1
         sampleControl.addTarget(self, action: #selector(viewValueChanged), for: .valueChanged)
         
+        // Measurement Accuracy control
+        accuracyControl.backgroundColor = .white
+        accuracyControl.selectedSegmentIndex = 0
+        accuracyControl.addTarget(self, action: #selector(viewValueChanged), for: .valueChanged)
+        
         // FindType control
         typeControl.selectedSegmentIndex = Int(findType.rawValue)
         typeControl.addTarget(self, action: #selector(viewValueChanged), for: .valueChanged)
         typeControl.translatesAutoresizingMaskIntoConstraints = false
         
         // Put 3 controls to StackView
-        let stackView = UIStackView(arrangedSubviews: [ confidenceControl, sampleControl, smoothedControl ])
+        let stackView = UIStackView(arrangedSubviews: [ confidenceControl, sampleControl, smoothedControl, accuracyControl ])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = 20
+        
+        // Info Text View
+        infoTextView.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.25)
+        infoTextView.textColor = .white
+        infoTextView.textAlignment = .justified
+        infoTextView.numberOfLines = 0
+        infoTextView.lineBreakMode = .byWordWrapping
+        infoTextView.translatesAutoresizingMaskIntoConstraints = false
+        infoTextView.text = ""
+        infoTextView.font = UIFont.monospacedSystemFont(ofSize: 17.0, weight: .semibold)
         
         // Gaze Point View
         gazePointView.isOpaque = true
@@ -165,17 +188,30 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         showHideButton.translatesAutoresizingMaskIntoConstraints = false
         showHideButton.layer.cornerRadius = CGFloat(24)
         
+        // Toggle View Mode Button
+        toggleViewButton.setImage(UIImage(systemName: "eye.circle"), for: .normal)
+        toggleViewButton.setPreferredSymbolConfiguration(showHideConfig, forImageIn: .normal)
+        toggleViewButton.setImage(UIImage(systemName: "video.circle"), for: .selected)
+        toggleViewButton.setPreferredSymbolConfiguration(showHideConfig, forImageIn: .selected)
+        toggleViewButton.tintColor = UIColor.white
+        toggleViewButton.addTarget(self, action: #selector(onClickButton), for: .touchUpInside)
+        toggleViewButton.backgroundColor = UIColor.init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.3)
+        toggleViewButton.translatesAutoresizingMaskIntoConstraints = false
+        toggleViewButton.layer.cornerRadius = CGFloat(24)
+        
         // Add View
         view.addSubview(gazePointView)
         view.addSubview(touchRadiusView)
         view.addSubview(probeRadiusView)
         view.addSubview(stackView)
+        view.addSubview(infoTextView)
         view.addSubview(typeControl)
         view.addSubview(findButton)
         view.addSubview(captureButton)
         view.addSubview(deleteButton)
         view.addSubview(undoButton)
         view.addSubview(showHideButton)
+        view.addSubview(toggleViewButton)
         
         touchRadiusWidthConstraint  = touchRadiusView.widthAnchor.constraint(equalToConstant: _diameter)
         touchRadiusHeightConstraint = touchRadiusView.heightAnchor.constraint(equalToConstant: _diameter)
@@ -187,6 +223,10 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             // StackView
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -32),
+            // InfoTextView
+            infoTextView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            infoTextView.bottomAnchor.constraint(equalTo: stackView.topAnchor, constant: -8),
+            //infoTextView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
             // FindType Control
             typeControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             typeControl.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
@@ -229,6 +269,11 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             showHideButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
             showHideButton.widthAnchor.constraint(equalToConstant: CGFloat(48)),
             showHideButton.heightAnchor.constraint(equalToConstant: CGFloat(48)),
+            // Toggle View State Button
+            toggleViewButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            toggleViewButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+            toggleViewButton.widthAnchor.constraint(equalToConstant: CGFloat(48)),
+            toggleViewButton.heightAnchor.constraint(equalToConstant: CGFloat(48)),
         ])
         
         // Touch Event
@@ -305,10 +350,13 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             findButton.isSelected = !findButton.isSelected // Toggle Button
             if findButton.isSelected { // onStartFindSurface
                 captureButton.isHidden = false
+                toggleViewButton.isHidden = true
             }
             else { // onStopFindSurface
                 renderer.clearLiveMesh()
+                infoTextView.text = ""
                 captureButton.isHidden = true
+                toggleViewButton.isHidden = false
             }
             
         case captureButton:
@@ -326,6 +374,18 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             showHideButton.isSelected = !showHideButton.isSelected // Toggle Button
             renderer.showPointCloud = !showHideButton.isSelected
             
+        case toggleViewButton:
+            toggleViewButton.isSelected = !toggleViewButton.isSelected // Toggle Button
+            renderer.setViewState(toThirdView: toggleViewButton.isSelected)
+            setUIVisible(show: !toggleViewButton.isSelected)
+            if toggleViewButton.isSelected {
+                // Stop FindSurface
+                if findButton.isSelected {
+                    findButton.isSelected = false
+                    captureButton.isHidden = true
+                    renderer.clearLiveMesh()
+                }
+            }
         default:
             break
         }
@@ -334,31 +394,50 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     // MARK: - Touch Event
     @objc
     func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-       if gesture.state == .changed {
+        if gesture.state == .changed {
             let velocity = Float(gesture.velocity)
-            let factor: Float = 10
+             
             
-            touchRadiusPixel = simd_clamp( touchRadiusPixel + (velocity * factor), MIN_TOUCH_RADIUS_PIXEL, MAX_VIEW_RADIUS )
-            if probeRadiusPixel > touchRadiusPixel {
-                probeRadiusPixel = touchRadiusPixel
+            if renderer.currentViewMode
+            {
+                let factor: Float = -0.05
+                
+                renderer.zoom3rdView(d: (velocity * factor))
             }
-            
-            // Update to view
-            updateTouchRadiusView()
-            updateProbeRadiusView()
+            else
+            {
+                let factor: Float = 10
+                
+                touchRadiusPixel = simd_clamp( touchRadiusPixel + (velocity * factor), MIN_TOUCH_RADIUS_PIXEL, MAX_VIEW_RADIUS )
+                if probeRadiusPixel > touchRadiusPixel {
+                    probeRadiusPixel = touchRadiusPixel
+                }
+                
+                // Update to view
+                updateTouchRadiusView()
+                updateProbeRadiusView()
+            }
         }
     }
     
     @objc
     func handlePan(_ gesture: UIPanGestureRecognizer) {
         if gesture.state == .changed {
-            let velocity = Float( gesture.velocity(in: view).y )
-            let factor: Float = 0.01
+            let velocity = gesture.velocity(in: view)
             
-            probeRadiusPixel = simd_clamp( probeRadiusPixel + (velocity * factor), MIN_PROBE_RADIUS_PIXEL, touchRadiusPixel )
-            
-            // Update to view
-            updateProbeRadiusView()
+            if renderer.currentViewMode
+            {
+                let factor: Float = 0.0005
+                renderer.rotate3rdView(dx: -Float(velocity.x) * factor, dy: Float(velocity.y) * factor)
+            }
+            else
+            {
+                let factor: Float = 0.01
+                probeRadiusPixel = simd_clamp( probeRadiusPixel + (Float(velocity.y) * factor), MIN_PROBE_RADIUS_PIXEL, touchRadiusPixel )
+                
+                // Update to view
+                updateProbeRadiusView()
+            }
         }
     }
     
@@ -407,10 +486,11 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         let touchRadius = (touchRadiusPixel / MAX_VIEW_RADIUS) / scaleFactor
         let probeRadius = (probeRadiusPixel / MAX_VIEW_RADIUS) / scaleFactor
         
-        let cameraTransform = camera.transform // Right-Handed
-        let rayDirection    = -simd_make_float3( cameraTransform.columns.2 )
-        let rayOrigin       =  simd_make_float3( cameraTransform.columns.3 )
-        let targetType      = findType
+        let cameraTransform  = camera.transform // Right-Handed
+        let rayDirection     = -simd_make_float3( cameraTransform.columns.2 )
+        let rayOrigin        =  simd_make_float3( cameraTransform.columns.3 )
+        let targetType       = findType
+        let errorAdjustValue = ERROR_ADJUST_VALUE[ accuracyControl.selectedSegmentIndex ]
 
         isFindSurfaceBusy = true
         fsTaskQueue.async {
@@ -421,8 +501,16 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
                 let distance  = abs( simd_dot( (pickPoint - rayOrigin), rayDirection ) )
                 let scaledTouchRadius = touchRadius * distance
                 
-                self.fsCtx.measurementAccuracy = 0.02 // measurement error is allowed about 2cm
-                self.fsCtx.meanDistance = 0.2         // mean distance is maximum 20 cm
+                let calculatedMeasurementAccuracy = 0.001 + (0.0005 * distance) * 2.0 // increase 0.5 mm per m (twice it) (minimum error is 1mm)
+                let calculatedMeanDistance        = (0.0075 * distance) * 5.0         // increase 7.5 mm per m (up to 5 times)
+                let adjustMeasurementAccuracy     = calculatedMeasurementAccuracy + errorAdjustValue // Add additional error adjust value
+                
+                // Calculate Measurement Accuracy & Mean Distance by Distance
+                self.fsCtx.measurementAccuracy = adjustMeasurementAccuracy
+                self.fsCtx.meanDistance        = calculatedMeanDistance
+                
+                // self.fsCtx.measurementAccuracy = 0.02; // error is allowed up to 2 cm
+                // self.fsCtx.meanDistance        = 0.2;  // up to 20 cm
                 
                 self.fsCtx.setPointCloudData( UnsafeRawPointer( cache.pointCloud ),
                                               pointCount: cache.pointCount,
@@ -463,6 +551,11 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
                         if let uniform = resultUniform {
                             DispatchQueue.main.async {
                                 if self.findButton.isSelected {
+                                    self.infoTextView.text = String(format: "IN RMS : %.2f mm / %.2f mm\nIN MEAN: %.2f mm\nOUT RMS: %.2f mm",
+                                                                    adjustMeasurementAccuracy * 1000.0,
+                                                                    calculatedMeasurementAccuracy * 1000.0,
+                                                                    calculatedMeanDistance * 1000.0,
+                                                                    result.rmsError * 1000.0)
                                     self.renderer.updateLiveMesh(uniform)
                                 }
                             }
@@ -471,6 +564,12 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
                     else {
                         // Not Found
                         DispatchQueue.main.async {
+                            if self.findButton.isSelected {
+                                self.infoTextView.text = String(format: "IN RMS : %.2f mm / %.2f mm\nIN MEAN: %.2f mm\nOUT RMS: ",
+                                                                adjustMeasurementAccuracy * 1000.0,
+                                                                calculatedMeasurementAccuracy * 1000.0,
+                                                                calculatedMeanDistance * 1000.0)
+                            }
                             self.renderer.clearLiveMesh()
                         }
                     }
@@ -500,6 +599,29 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         
         probeRadiusWidthConstraint!.constant = pd
         probeRadiusHeightConstraint!.constant = pd
-        
+    }
+    
+    // MARK: - Show / Hide UI Buttons
+    func setUIVisible(show: Bool) {
+        if show
+        {
+            typeControl.isHidden = false
+            gazePointView.isHidden = false
+            touchRadiusView.isHidden = false
+            probeRadiusView.isHidden = false
+            findButton.isHidden = false
+            deleteButton.isHidden = false
+            undoButton.isHidden = false
+        }
+        else
+        {
+            typeControl.isHidden = true
+            gazePointView.isHidden = true
+            touchRadiusView.isHidden = true
+            probeRadiusView.isHidden = true
+            findButton.isHidden = true
+            deleteButton.isHidden = true
+            undoButton.isHidden = true
+        }
     }
 }
