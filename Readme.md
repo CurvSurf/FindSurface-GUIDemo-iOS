@@ -82,4 +82,4 @@ Compared to the [basic demo](https://github.com/CurvSurf/FindSurface-BasicDemo-i
 
 **Third-person perspective view**
 
-![third-person](images/third-person.png)
+![third-person](images/third-person.PNG)
