@@ -59,6 +59,26 @@ Compared to the [basic demo](https://github.com/CurvSurf/FindSurface-BasicDemo-i
 13. Points shown on the screen are the visualization of the points provided by ARKit, of which colors indicate confidence levels (green, blue, and red mean high, medium, and low, respectively).
 
 
+## About Noise Level Estimation
+
+`FindSurface` requires *a priori* root-mean-squared error of the measurement points (See the measurement accuracy description in [this document](https://github.com/CurvSurf/FindSurface#how-does-it-work) for details). To determine an appropriate value of the measurement accuracy parameter, we built a linear model of normal noise for the app:
+
+````
+base_error(distance) = a + b * distance * 2
+// the distance is in meters.
+````
+
+We set the values of `a = 0.001` and `b = 0.00005` for the normal (expected) noise model as a result of our experiments and introduced an additional constant values for each model, of which the values have been heuristically determined, to derive the following variations of the model: 
+
+````
+lower_error(distance) = base_error(distance) - 0.001
+normal_error(distance) = base_error(distance) + 0.001
+higher_error(distance) = base_error(distance) + 0.003
+````
+
+The app calculates a concrete value of the *a priori* error according to the distance and the error level that users set (e.i., `E.Low`, `E.Med`, and `E.High`).
+
+
 
 ## Output Examples
 
