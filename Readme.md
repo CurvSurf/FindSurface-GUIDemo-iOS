@@ -10,7 +10,7 @@ This demo app demonstrates a real-time application using FindSurface to search p
 
 **NOTE:** The repositories listed below are presently inaccessible due to internal complications. If you have any inquiries or require further assistance in relation to this matter, please contact to support@curvsurf.com. We greatly appreciate your patience and understanding during this period.
 
-[FindSurfaceFramework (unavailable)](https://github.com/CurvSurf/FindSurface-iOS) is required to build the source code into a program. Download the framework [here (unavailable)](https://github.com/CurvSurf/FindSurface-iOS/releases) and refer to [here (unavailable)](https://github.com/CurvSurf/FindSurface-iOS/blob/master/How-to-import-FindSurface-Framework-to-your-project.md) for an instruction about how to setup your project to build it with the framework.
+[FindSurfaceFramework](https://github.com/CurvSurf/FindSurface-iOS) is required to build the source code into a program. Download the framework [here](https://github.com/CurvSurf/FindSurface-iOS/releases) and refer to [here](https://github.com/CurvSurf/FindSurface-iOS/blob/master/How-to-import-FindSurface-Framework-to-your-project.md) for an instruction about how to setup your project to build it with the framework.
 
 
 
