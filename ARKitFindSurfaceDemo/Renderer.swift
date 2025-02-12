@@ -428,7 +428,7 @@ class Renderer {
         // Create a pipeline state for rendering the captured image
         let capturedImagePipelineStateDescriptor = MTLRenderPipelineDescriptor()
         capturedImagePipelineStateDescriptor.label = "MyCapturedImagePipeline"
-        capturedImagePipelineStateDescriptor.sampleCount = renderDestination.sampleCount
+        capturedImagePipelineStateDescriptor.rasterSampleCount = renderDestination.sampleCount
         capturedImagePipelineStateDescriptor.vertexFunction = capturedImageVertexFunction
         capturedImagePipelineStateDescriptor.fragmentFunction = capturedImageFragmentFunction
         capturedImagePipelineStateDescriptor.vertexDescriptor = imagePlaneVertexDescriptor
@@ -473,7 +473,7 @@ class Renderer {
         // Create a reusable pipeline state for rendering result mesh geometry
         let resultMeshPipelineStateDescriptor = MTLRenderPipelineDescriptor()
         resultMeshPipelineStateDescriptor.label = "MyResultMeshPipeline"
-        resultMeshPipelineStateDescriptor.sampleCount = renderDestination.sampleCount
+        resultMeshPipelineStateDescriptor.rasterSampleCount = renderDestination.sampleCount
         resultMeshPipelineStateDescriptor.vertexFunction = resultMeshGeometryVertexFunction
         resultMeshPipelineStateDescriptor.fragmentFunction = resultMeshGeometryFragmentFunction
         resultMeshPipelineStateDescriptor.vertexDescriptor = geometryVertexDescriptor

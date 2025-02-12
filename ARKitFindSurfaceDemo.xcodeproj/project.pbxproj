@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,6 +16,7 @@
 		2B90658626AFFF9A00B6AE91 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B90658426AFFF9A00B6AE91 /* LaunchScreen.storyboard */; };
 		2B90658F26B001A700B6AE91 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B90658E26B001A700B6AE91 /* Helper.swift */; };
 		2B9065AF26B0F45400B6AE91 /* FindSurfaceResultExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9065AE26B0F45400B6AE91 /* FindSurfaceResultExtension.swift */; };
+		F3CA3CF62D5DFA2F00E66EFB /* FindSurface-iOS in Frameworks */ = {isa = PBXBuildFile; productRef = F3CA3CF52D5DFA2F00E66EFB /* FindSurface-iOS */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,6 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F3CA3CF62D5DFA2F00E66EFB /* FindSurface-iOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +147,9 @@
 				Base,
 			);
 			mainGroup = 2B90656A26AFFF9600B6AE91;
+			packageReferences = (
+				F3CA3CF42D5DFA2F00E66EFB /* XCRemoteSwiftPackageReference "FindSurface-iOS" */,
+			);
 			productRefGroup = 2B90657426AFFF9600B6AE91 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -331,6 +336,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = ARKitFindSurfaceDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -355,6 +361,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = ARKitFindSurfaceDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -389,6 +396,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F3CA3CF42D5DFA2F00E66EFB /* XCRemoteSwiftPackageReference "FindSurface-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://www.github.com/CurvSurf/FindSurface-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F3CA3CF52D5DFA2F00E66EFB /* FindSurface-iOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F3CA3CF42D5DFA2F00E66EFB /* XCRemoteSwiftPackageReference "FindSurface-iOS" */;
+			productName = "FindSurface-iOS";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2B90656B26AFFF9600B6AE91 /* Project object */;
 }
