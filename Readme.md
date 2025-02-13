@@ -8,22 +8,19 @@
 
 This demo app demonstrates a real-time application using FindSurface to search point clouds, which ARKit provides, for geometry shapes. 
 
-**NOTE:** The repositories listed below are presently inaccessible due to internal complications. If you have any inquiries or require further assistance in relation to this matter, please contact to support@curvsurf.com. We greatly appreciate your patience and understanding during this period.
 
-[FindSurfaceFramework](https://github.com/CurvSurf/FindSurface-iOS) is required to build the source code into a program. Download the framework [here](https://github.com/CurvSurf/FindSurface-iOS/releases) and refer to [here](https://github.com/CurvSurf/FindSurface-iOS/blob/master/How-to-import-FindSurface-Framework-to-your-project.md) for an instruction about how to setup your project to build it with the framework.
+## [FindSurface Library Package](https://www.github.com/CurvSurf/FindSurface-iOS)
 
+Unlike the older version of this demo, you don't need to download or setup the binary path for your project since the library is provided as a Swift package.
 
 
 ## Requirements
 
 This demo app requires the LiDAR sensor to get a point cloud from ARKit.
 
-- Apple iPad Pro LiDAR
-- Apple iPhone 12 Pro
-- Apple iPhone 12 Pro Max
-- Apple iPhone 13 Pro
-- Apple iPhone 13 Pro Max
-
+- Apple iPad Pro LiDAR or newer devices with LiDAR sensor.
+- Apple iPhone 12 Pro or newer devices with LiDAR sensor.
+- Apple iPhone 12 Pro Max or newer devices with LiDAR sensor.
 
 
 ## Features
@@ -34,7 +31,6 @@ Compared to the [basic demo](https://github.com/CurvSurf/FindSurface-BasicDemo-i
 - Using input point cloud data provided by ARKit;
 - Detected surfaces rendered in overlay (AR rendering);
 - GUI interfaces to manipulate the app's settings (e.g., confidence, smoothed depth, feature types).
-
 
 
 ## User Interface
