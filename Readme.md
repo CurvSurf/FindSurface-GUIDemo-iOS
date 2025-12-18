@@ -2,7 +2,7 @@
 
 **Curv*Surf* FindSurface™** GUIDemo for iOS (Swift)
 
-
+[FindSurface](https://github.com/CurvSurf/FindSurface) / [FindSurface-iOS](https://github.com/CurvSurf/FindSurface-iOS)
 
 ## Overview
 
