@@ -22,6 +22,11 @@ This demo app requires the LiDAR sensor to get a point cloud from ARKit.
 - Apple iPhone 12 Pro or newer devices with LiDAR sensor.
 - Apple iPhone 12 Pro Max or newer devices with LiDAR sensor.
 
+> NOTE: Based on our internal testing, we believe there are at least two practical “generations” of LiDAR depth range across iPhone models. On iPhone 11 Pro, LiDAR depth values were not produced beyond 5 m. On iPhone 16 Pro and iPhone 17 Pro, depth can be observed beyond 5 m, but it still appears to top out at roughly ~10 m.
+>
+>  We suspect a hardware revision introduced this step change at some point, [around iPhone 15 Pro](https://arboreal.se/en/blog/evaluation_of_lidar_sensor_iPhones_iPads?utm_source=chatgpt.com), but we have not found an official Apple source that documents the range change or a per-model maximum distance. Please treat these figures as empirical observations under our test conditions rather than guaranteed specifications.
+>
+>  No code changes are required. The app will automatically benefit from the extended depth range on devices that provide it. For best results, validate on the newest hardware available.
 
 ## Features
 
